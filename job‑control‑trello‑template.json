@@ -1,0 +1,27 @@
+{
+  "name": "Job‑Control Project Board",
+  "lists": [
+    { "name": "Backlog", "cards": [
+        { "name": "Definir requisitos funcionales y no funcionales", "labels": ["Frontend","Backend","Diseño"] },
+        { "name": "Diseñar wireframes en Figma – login/registro", "labels": ["Diseño"] },
+        { "name": "Configurar repositorio backend (Node/Express)", "labels": ["Backend","Despliegue"] }
+      ]
+    },
+    { "name": "To Do (Sprint actual)", "cards": [
+        { "name": "Crear repositorio frontend (Vue + Pinia + Vue Router)", "labels": ["Frontend"] },
+        { "name": "Elegir librería para gráficas (Chart.js / ApexCharts)", "labels": ["Frontend","Diseño"] }
+      ]
+    },
+    { "name": "In Progress", "cards": [] },
+    { "name": "Review / QA", "cards": [] },
+    { "name": "Blocked / Issues", "cards": [] },
+    { "name": "Done", "cards": [] }
+  ],
+  "labels": [
+    { "name": "Frontend", "color": "blue" },
+    { "name": "Backend",  "color": "green" },
+    { "name": "Diseño",   "color": "yellow" },
+    { "name": "Test",     "color": "red" },
+    { "name": "Despliegue","color": "purple" }
+  ]
+}

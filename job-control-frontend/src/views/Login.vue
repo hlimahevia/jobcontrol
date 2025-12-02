@@ -27,7 +27,12 @@ const handleLogin = async () => {
     <form class="login-form" @submit.prevent="handleLogin">
       <h2>Iniciar sesión</h2>
 
-      <input type="email" v-model="email" placeholder="Correo electrónico" required />
+      <input
+        type="email"
+        v-model="email"
+        placeholder="Correo electrónico"
+        required
+      />
 
       <div class="input-password">
         <input
@@ -48,6 +53,11 @@ const handleLogin = async () => {
       <p class="register-link">
         ¿No tienes cuenta?
         <router-link to="/register">Regístrate aquí</router-link>
+      </p>
+      <p class="forgot-link">
+        <router-link to="/forgot-password"
+          >¿Olvidaste tu contraseña?</router-link
+        >
       </p>
     </form>
   </div>
@@ -133,5 +143,19 @@ button:hover {
   margin-top: 1rem;
   text-align: center;
   font-size: 0.95rem;
+}
+
+.forgot-link {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.forgot-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.forgot-link a:hover {
+  text-decoration: underline;
 }
 </style>

@@ -1,108 +1,132 @@
+<script setup>
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import api from "@/services/api";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import MessageAlert from "@/components/MessageAlert.vue";
+
+const route = useRoute();
+const router = useRouter();
+
+const token = ref("");
+const newPassword = ref("");
+const confirmPassword = ref("");
+
+const message = ref("");
+const error = ref("");
+const loading = ref(false);
+
+onMounted(() => {
+  token.value = route.query.token || "";
+  if (!token.value) {
+    error.value = "Token inválido o faltante.";
+  }
+});
+
+const handleReset = async () => {
+  error.value = "";
+  message.value = "";
+  loading.value = true;
+
+  if (newPassword.value !== confirmPassword.value) {
+    error.value = "Las contraseñas no coinciden.";
+    loading.value = false;
+    return;
+  }
+
+  try {
+    await api.post("/auth/reset-password", {
+      token: token.value,
+      newPassword: newPassword.value,
+    });
+
+    message.value = "Contraseña actualizada correctamente. Redirigiendo...";
+    setTimeout(() => router.push("/login"), 3000);
+  } catch (err) {
+    error.value = err.response?.data?.message || "Error al restablecer contraseña.";
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
+
 <template>
   <div class="reset-password">
-    <form @submit.prevent="handleSubmit">
-      <h2>Restablecer contraseña</h2>
-      <div class="input-password">
-        <input
-          :type="showPassword ? 'text' : 'password'"
-          v-model="newPassword"
-          placeholder="Nueva contraseña"
-          required
-        />
-        <span class="toggle-icon" @click="showPassword = !showPassword">
-          {{ showPassword ? '🙈' : '👁️' }}
-        </span>
-      </div>
+    <form @submit.prevent="handleReset">
+      <h2>Restablecer Contraseña</h2>
 
-      <button type="submit">Actualizar</button>
+      <input
+        type="password"
+        v-model="newPassword"
+        placeholder="Nueva contraseña"
+        required
+      />
+      <input
+        type="password"
+        v-model="confirmPassword"
+        placeholder="Confirmar nueva contraseña"
+        required
+      />
+
+      <button type="submit">Actualizar contraseña</button>
 
       <p v-if="message" class="success">{{ message }}</p>
       <p v-if="error" class="error">{{ error }}</p>
     </form>
   </div>
+
+  <LoadingSpinner v-if="loading" />
+  <MessageAlert v-if="message" type="success" :message="message" />
+  <MessageAlert v-if="error" type="error" :message="error" />
 </template>
-
-<script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import api from '@/services/api';
-
-const route = useRoute();
-const router = useRouter();
-const newPassword = ref('');
-const message = ref('');
-const error = ref('');
-const showPassword = ref(false);
-let token = '';
-
-onMounted(() => {
-  token = route.query.token;
-  if (!token) {
-    error.value = 'Token no proporcionado';
-  }
-});
-
-const handleSubmit = async () => {
-  error.value = '';
-  message.value = '';
-
-  if (!token) {
-    error.value = 'Token inválido';
-    return;
-  }
-
-  try {
-    await api.post('/auth/reset-password', {
-      token,
-      newPassword: newPassword.value,
-    });
-    message.value = 'Contraseña actualizada correctamente. Puedes iniciar sesión.';
-    setTimeout(() => router.push('/login'), 2000);
-  } catch (err) {
-    error.value = 'Error al actualizar la contraseña';
-  }
-};
-</script>
 
 <style scoped>
 .reset-password {
   max-width: 400px;
   margin: 4rem auto;
   padding: 2rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-.input-password {
-  position: relative;
-  margin-bottom: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
 }
 
 input {
   width: 100%;
   padding: 0.6rem;
-  padding-right: 2.5rem;
-  box-sizing: border-box;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-.toggle-icon {
-  position: absolute;
-  right: 0.6rem;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 1.2rem;
+input:focus {
+  border-color: #3498db;
+  outline: none;
 }
 
 button {
   width: 100%;
   padding: 0.7rem;
+  background-color: #f0b429;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+button:hover {
+  background-color: white;
+  color: #f0b429;
+  border: 2px solid #f0b429;
 }
 
 .success {
   color: green;
+  margin-top: 1rem;
 }
+
 .error {
   color: red;
+  margin-top: 1rem;
 }
 </style>

@@ -3,7 +3,7 @@ import Login from "@/views/Login.vue";
 import Register from "@/views/Register.vue";
 import Dashboard from "@/views/Dashboard.vue";
 import ForgotPassword from "@/views/ForgotPassword.vue";
-import ResetPassword from "../views/ResetPassword.vue";
+import ResetPassword from "@/views/ResetPassword.vue";
 
 const routes = [
   { path: "/", redirect: "/login" },

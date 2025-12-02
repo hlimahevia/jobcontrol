@@ -1,11 +1,16 @@
-// /mnt/data/auth.js
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
-// Registro
+//
+// ──────────────────────────────────────────────
+//   🔐 REGISTRO DE USUARIO
+// ──────────────────────────────────────────────
+//
 router.post("/register", async (req, res) => {
   const { nombre, apellidos, email, password } = req.body;
 
@@ -36,7 +41,11 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// Login
+//
+// ──────────────────────────────────────────────
+//   🔑 LOGIN
+// ──────────────────────────────────────────────
+//
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -81,6 +90,100 @@ router.post("/login", async (req, res) => {
     });
   } catch (err) {
     console.error("Error en /login:", err);
+    res.status(500).json({ message: "Error del servidor" });
+  }
+});
+
+//
+// ──────────────────────────────────────────────
+//   🔄 RECUPERAR CONTRASEÑA - ENVÍO DE EMAIL
+// ──────────────────────────────────────────────
+//
+router.post("/forgot-password", async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    console.log("📥 Solicitud para recuperar contraseña:", email);
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log("❌ Usuario no encontrado");
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Generar token único
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hora
+    await user.save();
+
+    const resetLink = `${process.env.CLIENT_URL}/reset-password?token=${resetToken}`;
+
+    const html = `
+      <h2>Recuperación de contraseña</h2>
+      <p>Hola ${user.nombre},</p>
+      <p>Haz clic en el siguiente enlace para restablecer tu contraseña:</p>
+      <a href="${resetLink}">${resetLink}</a>
+      <p>Este enlace expirará en 1 hora.</p>
+    `;
+
+    await sendEmail(
+      user.email,
+      "Recuperación de contraseña - Job-Control",
+      html
+    );
+
+    console.log("📧 Email enviado correctamente a:", user.email);
+
+    res.json({ message: "Correo enviado. Revisa tu bandeja de entrada." });
+  } catch (err) {
+    console.error("Error en forgot-password:", err);
+    res.status(500).json({ message: "Error al enviar el correo" });
+  }
+});
+
+//
+// ──────────────────────────────────────────────
+//   🔁 RESET PASSWORD - CAMBIAR CONTRASEÑA
+// ──────────────────────────────────────────────
+//
+router.post("/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+
+  try {
+    console.log("🔑 Solicitud para reset-password con token:", token);
+
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      console.log("❌ Token inválido o expirado");
+      return res.status(400).json({ message: "Token inválido o expirado" });
+    }
+
+    // Validación de seguridad
+    const passwordRegex = /^(?=.*[0-9])(?=.*[!@#$%^&*]).{6,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "La contraseña debe tener al menos 6 caracteres, un número y un símbolo",
+      });
+    }
+
+    user.password = newPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    console.log("🔐 Contraseña actualizada para:", user.email);
+
+    res.json({ message: "Contraseña actualizada correctamente" });
+  } catch (err) {
+    console.error("Error en reset-password:", err);
     res.status(500).json({ message: "Error del servidor" });
   }
 });

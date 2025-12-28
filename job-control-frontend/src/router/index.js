@@ -10,13 +10,13 @@ import ResetPassword from "@/views/ResetPassword.vue";
 const routes = [
   { path: "/", redirect: "/login" },
 
-  // Rutas públicas
+  // Public routes
   { path: "/login", component: Login, meta: { guest: true } },
   { path: "/register", component: Register, meta: { guest: true } },
   { path: "/forgot-password", component: ForgotPassword, meta: { guest: true } },
-  { path: "/reset-password/:token", component: ResetPassword, meta: { guest: true } },
+  { path: "/reset-password", component: ResetPassword, meta: { guest: true } },
 
-  // Rutas privadas
+  // Private routes
   { path: "/dashboard", component: Dashboard, meta: { requiresAuth: true } },
 ];
 
@@ -25,17 +25,15 @@ export const router = createRouter({
   routes,
 });
 
-// 🔐 Navigation Guard Global
+// 🔐 Global navigation guard
 router.beforeEach((to, from, next) => {
   const userStore = useUserStore();
   const isAuthenticated = !!userStore.token;
 
-  // Rutas que requieren estar logueado
   if (to.meta.requiresAuth && !isAuthenticated) {
     return next("/login");
   }
 
-  // Rutas solo para invitados
   if (to.meta.guest && isAuthenticated) {
     return next("/dashboard");
   }

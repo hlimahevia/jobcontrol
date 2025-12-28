@@ -144,22 +144,29 @@ const submitTask = async () => {
 
 <template>
   <div class="task-form-container">
-    <h3>Register Task</h3>
+    <h3 class="register-title">Register Task</h3>
 
-    <form @submit.prevent="submitTask">
-      <!-- Date -->
+    <form @submit.prevent="submitTask" class="task-form">
+
+  <div class="form-grid">
+    <!-- Date -->
+    <div class="form-field">
       <label>Date</label>
       <input type="date" v-model="date" required />
+    </div>
 
-      <!-- Shift -->
+    <!-- Shift -->
+    <div class="form-field">
       <label>Shift</label>
       <select v-model="shiftNumber" required>
         <option disabled value="">Select shift</option>
         <option value="1">Shift 1</option>
         <option value="2">Shift 2</option>
       </select>
+    </div>
 
-      <!-- Area -->
+    <!-- Area -->
+    <div class="form-field">
       <label>Area</label>
       <select v-model="area" required>
         <option disabled value="">Select area</option>
@@ -170,101 +177,169 @@ const submitTask = async () => {
         <option>ICQA</option>
         <option>INDIRECT</option>
       </select>
+    </div>
 
-      <!-- Task -->
+    <!-- Task -->
+    <div class="form-field">
       <label>Task</label>
       <select v-model="task" required>
         <option disabled value="">Select task</option>
-
         <option v-for="t in availableTasks" :key="t">
           {{ t }}
         </option>
       </select>
+    </div>
 
-      <!-- Start Time -->
+    <!-- Start Time -->
+    <div class="form-field">
       <label>Start Time</label>
       <input type="time" v-model="startTime" required />
+    </div>
 
-      <!-- End Time -->
+    <!-- End Time -->
+    <div class="form-field">
       <label>End Time</label>
       <input type="time" v-model="endTime" required />
+    </div>
+  </div>
 
-      <!-- Issue toggle -->
-      <label class="checkbox-row">
-        <input type="checkbox" v-model="hasIncident" />
-        Has Issue
-      </label>
+  <!-- FOOTER -->
+  <div class="form-footer">
+    <label class="checkbox-row">
+      <input type="checkbox" v-model="hasIncident" />
+      <span>Has Issue</span>
+    </label>
 
-      <input
-        v-if="hasIncident"
-        type="text"
-        v-model="incidentDescription"
-        placeholder="Describe the issue"
-      />
+    <input
+      v-if="hasIncident"
+      type="text"
+      v-model="incidentDescription"
+      placeholder="Describe the issue"
+      class="issue-input"
+    />
 
-      <button type="submit" :disabled="loading">
-        {{ loading ? "Saving..." : "Send" }}
-      </button>
+    <button type="submit" :disabled="loading" class="send-btn">
+      {{ loading ? "Saving..." : "Send" }}
+    </button>
 
-      <p v-if="error" class="error">{{ error }}</p>
-      <p v-if="success" class="success">Task saved successfully!</p>
-    </form>
+    <p v-if="error" class="error">{{ error }}</p>
+    <p v-if="success" class="success">Task saved successfully!</p>
+  </div>
+
+</form>
   </div>
 </template>
 
 <style scoped>
 .task-form-container {
   background: #ffffff;
-  padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  margin-bottom: 20px;
+  padding: 2rem;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  margin-bottom: 24px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+.register-title{
+  padding-bottom: 20px;
+}
+/* GRID 2 COLUMNAS */
+.task-form {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+}
+
+/* CAMPOS */
+.form-field {
+  display: flex;
+  flex-direction: column;
 }
 
 label {
-  display: block;
-  margin-top: 10px;
   font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
 }
 
+/* INPUTS */
 input,
 select {
-  width: 100%;
-  padding: 0.6rem;
-  margin-top: 4px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-button {
-  margin-top: 15px;
-  padding: 0.7rem;
-  width: 100%;
-  border: none;
-  background: #4caf50;
-  color: white;
-  font-size: 1rem;
-  border-radius: 6px;
-  cursor: pointer;
+input:focus,
+select:focus {
+  border-color: #56ccf2;
+  box-shadow: 0 0 0 3px rgba(86, 204, 242, 0.3);
 }
 
-button:hover {
-  background: #449d48;
+/* FOOTER */
+.form-footer {
+  margin-top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
+/* CHECKBOX */
 .checkbox-row {
-  margin-top: 10px;
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 0.95rem;
 }
 
+/* ISSUE INPUT */
+.issue-input {
+  width: 100%;
+}
+
+/* BOTÓN SEND */
+.send-btn {
+  align-self: center;
+  margin-top: 10px;
+  padding: 0.55rem 2.2rem;
+  background: #6fcf97;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.send-btn:hover {
+  background: #5bbf86;
+}
+
+/* MENSAJES */
 .error {
-  color: red;
-  margin-top: 10px;
+  color: #eb5757;
+  font-size: 0.9rem;
 }
+
 .success {
-  color: green;
-  margin-top: 10px;
+  color: #27ae60;
+  font-size: 0.9rem;
 }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 </style>

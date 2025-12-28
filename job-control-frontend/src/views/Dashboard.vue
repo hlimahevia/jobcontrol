@@ -139,7 +139,33 @@ const applyAnalyticsFilter = () => {
 const setAnalyticsRange = (range) => {
   analyticsRange.value = range;
   applyAnalyticsFilter();
+
+  if (!activeTab.value) {
+    activeTab.value = "hoursByTask";
+  }
 };
+
+/* ========================================================================
+   ANALYTICS TABS
+========================================================================= */
+
+const activeTab = ref("hoursByTask");
+
+const analyticsTitle = computed(() => {
+  switch (activeTab.value) {
+    case "hoursByTask":
+      return "Total Hours by Task";
+    case "hoursByArea":
+      return "Total Hours by Area";
+    case "issueRate":
+      return "Issue Rate";
+    case "topIssues":
+      return "Top Tasks with Issues";
+    default:
+      return "";
+  }
+});
+
 
 /* =========================================================================
    INITIAL LOAD
@@ -193,19 +219,19 @@ onMounted(async () => {
     <div class="analytics">
       <h2>Analytics Dashboard</h2>
 
-      <div class="analytics-range-buttons">
-        <button :class="{active: analyticsRange==='day'}" @click="setAnalyticsRange('day')">Day</button>
-        <button :class="{active: analyticsRange==='week'}" @click="setAnalyticsRange('week')">Week</button>
-        <button :class="{active: analyticsRange==='month'}" @click="setAnalyticsRange('month')">Month</button>
-        <button :class="{active: analyticsRange==='year'}" @click="setAnalyticsRange('year')">Year</button>
-        <button :class="{active: analyticsRange==='all'}" @click="setAnalyticsRange('all')">All</button>
-      </div>
-
       <div class="tabs">
         <button @click="activeTab='hoursByTask'" :class="{active: activeTab==='hoursByTask'}">Hours by Task</button>
         <button @click="activeTab='hoursByArea'" :class="{active: activeTab==='hoursByArea'}">Hours by Area</button>
         <button @click="activeTab='issueRate'" :class="{active: activeTab==='issueRate'}">Issue Rate</button>
         <button @click="activeTab='topIssues'" :class="{active: activeTab==='topIssues'}">Top Tasks with Issues</button>
+      </div>
+
+            <div class="analytics-range-buttons">
+        <button :class="{active: analyticsRange==='day'}" @click="setAnalyticsRange('day')">Day</button>
+        <button :class="{active: analyticsRange==='week'}" @click="setAnalyticsRange('week')">Week</button>
+        <button :class="{active: analyticsRange==='month'}" @click="setAnalyticsRange('month')">Month</button>
+        <button :class="{active: analyticsRange==='year'}" @click="setAnalyticsRange('year')">Year</button>
+        <button :class="{active: analyticsRange==='all'}" @click="setAnalyticsRange('all')">All</button>
       </div>
 
       <div class="chart-section">
@@ -227,7 +253,7 @@ onMounted(async () => {
 .dashboard-container {
   max-width: 1200px;
   margin: auto;
-  padding: 24px;
+  padding: 44px;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -290,7 +316,7 @@ select {
 input:focus,
 select:focus {
   border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
 /* ===========================
@@ -364,7 +390,7 @@ button:active {
 }
 
 .tabs button {
-  background: #e2e8f0;
+  background: #4c6286;
   border-radius: 8px;
 }
 
